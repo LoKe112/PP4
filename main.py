@@ -65,6 +65,67 @@ def group_by_month_with_average_value(df: pd.DataFrame) -> pd.Series:
     """
     
     return df.groupby(df.Date.dt.month)["Value"].mean()
+  
+def show_value_graph(df: pd.DataFrame) -> None:
+    """Show of the value for the entire period
+    Args:
+      df: Dataframe with original values
+      
+    """
+   
+    fig = plt.figure(figsize=(19, 5))
+    plt.ylabel("Value")
+    plt.xlabel("date")
+    plt.title('Курс долара(американские горки в конце)')
+    plt.plot(df["Date"], df["Value"], color='blue',
+                linestyle='-', linewidth=1)
+    plt.show()
+    
+def show_value_graph_median_average(df: pd.DataFrame, month: int) -> None:
+    """Showing graph for the specified month
+    Args:
+      df: Dataframe with original values
+      month: The month for which the temperature graph is drawn
+      
+    """
+    month_df = df[(df.Date.dt.month == month)]
+    fig = plt.figure(figsize=(18, 8))
+
+    fig.add_subplot(1, 3, 1)
+    plt.ylabel("Value")
+    plt.xlabel("date")
+    plt.plot(month_df.Date.dt.day, month_df["Value"],
+             color='blue', linestyle='--', linewidth=2, label='Value')
+    plt.axhline(y=month_df["Value"].mean(
+    ), color='orange', label="Average value")
+    plt.axhline(y=month_df["Value"].median(
+    ), color='black', label="Median")
+    plt.legend(loc=2, prop={'size': 8})
+
+
+def show_value_graph_median_average_year(df: pd.DataFrame, month: int, year: int) -> None:
+    """Showing graph for the specified month
+    Args:
+      df: Dataframe with original values
+      month: The month for which the temperature graph is drawn
+      
+    """
+    month_df = df[(df.Date.dt.month == month) & (df.Date.dt.year == year)]
+    fig = plt.figure(figsize=(18, 8))
+
+    fig.add_subplot(1, 3, 1)
+    plt.ylabel("Value")
+    plt.xlabel("date")
+    plt.plot(month_df.Date.dt.day, month_df["Value"],
+             color='blue', linestyle='--', linewidth=2, label='Value')
+    plt.axhline(y=month_df["Value"].mean(
+    ), color='orange', label="Average value")
+    plt.axhline(y=month_df["Value"].median(
+    ), color='black', label="Median")
+    plt.legend(loc=2, prop={'size': 8})
+    
+
+    plt.show()
 
 df = get_processed_df("dataset.csv")
       
