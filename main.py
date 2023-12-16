@@ -16,11 +16,38 @@ def get_processed_df(path: str) -> pd.DataFrame:
     df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
     if not ((df.isnull().sum()).eq(0).all()):
         df.dropna(inplace=True, ignore_index=True)
-    curestd,curemean = df['Value'].std(),df['Value'].mean()
-    df['MeanDeviation'] = curemean-df['Value']
-    df['StdDeviation'] = curestd-df['Value']
+    curestd,curemedian = df['Value'].mean(),df['Value'].median()
+    df['MedianDeviation'] = abs(curemedian-df['Value'])
+    df['StdDeviation'] = abs(curestd-df['Value'])
     return df
 
+def get_statistical_info(df: pd.DataFrame, parametr: str) -> pd.Series:
+    """Getting statistical information
+    Args:
+      df: Dataframe with original values
+      parametr: column for statistic
+    Returns:
+      A series containing a statistical info
+    """
+    if parametr in df.columns:
+        return df[parametr].describe()
+      
+def std_deviation_filtration(df: pd.DataFrame, std_deviation: float) -> pd.DataFrame:
+    """Filtering by column temperature in degrees Celsius
+    Args:
+      df: Dataframe with original values
+      celsius_temp: temperature in degrees Celsius
+    Returns:
+      Dataframe with days in which the temperature is not less than the set temperature
+    """
+    return df[df["StdDeviation"] >= std_deviation]
 
+df = get_processed_df("dataset.csv")
+      
 
 print(get_processed_df("dataset.csv"))
+
+print(get_statistical_info(df, "Value"))
+print(get_statistical_info(df, "MedianDeviation"))
+print(get_statistical_info(df, "StdDeviation"))
+print(std_deviation_filtration(df, 25))
