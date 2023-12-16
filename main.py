@@ -8,7 +8,7 @@ def get_processed_df(path: str) -> pd.DataFrame:
     Args:
       path: path to dataset
     Returns:
-      Dataframe without NaN values and with the addition of the Fahrenheit temperature column
+      Dataframe
     """
     df = pd.read_csv(path, header=None)
     df.columns = ["Date",
@@ -33,14 +33,38 @@ def get_statistical_info(df: pd.DataFrame, parametr: str) -> pd.Series:
         return df[parametr].describe()
       
 def std_deviation_filtration(df: pd.DataFrame, std_deviation: float) -> pd.DataFrame:
-    """Filtering by column temperature in degrees Celsius
+    """Filtering std deviation
     Args:
       df: Dataframe with original values
-      celsius_temp: temperature in degrees Celsius
+      std_deviation: std deviation
     Returns:
-      Dataframe with days in which the temperature is not less than the set temperature
+      Dataframe with deviation
     """
     return df[df["StdDeviation"] >= std_deviation]
+
+def date_filtration(df: pd.DataFrame, start_date: str, end_date: str) -> pd.DataFrame:
+    """Filtering by date
+    Args:
+      df: Dataframe with original values
+      start_date: date_from
+      end_date: End date_to
+    Returns:
+      Dataframe with days that range [date_from; date_to]
+    """
+    start_date = pd.to_datetime(start_date, format='%Y-%m-%d')
+    end_date = pd.to_datetime(end_date, format='%Y-%m-%d')
+    return df[(start_date <= df["Date"]) & (df["Date"] <= end_date)]
+  
+def group_by_month_with_average_value(df: pd.DataFrame) -> pd.Series:
+    """Grouping by month with calculation of the average value
+    Args:
+      df: Dataframe with original values
+      
+    Returns:
+      A series indicating the average value for all months
+    """
+    
+    return df.groupby(df.Date.dt.month)["Value"].mean()
 
 df = get_processed_df("dataset.csv")
       
@@ -51,3 +75,5 @@ print(get_statistical_info(df, "Value"))
 print(get_statistical_info(df, "MedianDeviation"))
 print(get_statistical_info(df, "StdDeviation"))
 print(std_deviation_filtration(df, 25))
+print(date_filtration(df, "2021-11-11", "2021-11-22"))
+print(group_by_month_with_average_value(df))
